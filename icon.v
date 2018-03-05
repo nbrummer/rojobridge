@@ -32,13 +32,14 @@
 
 module icon(
     input               clock,
+    input               botNum,
     input               reset_n,
     input      [11:0]   pixel_row,
     input      [11:0]   pixel_column,
     input       [7:0]   BotInfo_reg,
     input       [7:0]   LocX_reg,
     input       [7:0]   LocY_reg,
-    output  reg [1:0]   icon
+    output  reg [3:0]   icon
     );
     
     // Dynamically updating the pointers to memory locations handled by the following wires and
@@ -51,13 +52,14 @@ module icon(
     // ROMS for the orientation-specific icon
     reg  [0:31]         iconmemEast[0:15];
 	reg  [31:0]			iconmemWest[0:15];
+	/*
 	reg  [0:31]			iconmemNorthEast[0:15];
 	reg	 [31:0]		    iconmemNorthWest[0:15];
 	reg  [0:31]			iconmemNorth[0:15];
 	reg  [0:31]			iconmemSouth[0:15];
 	reg  [31:0]			iconmemSouthEast[0:15];
 	reg  [0:31]			iconmemSouthWest[0:15];
-    
+    */
     
     parameter
         NORTH       = 3'b000,
@@ -71,14 +73,16 @@ module icon(
      
     // text files for icons read below   
     initial begin
-        $readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBot.txt", iconmemEast);
-		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBot.txt", iconmemWest);
+        $readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project_final/rojobridge/icons/tortoiseEast.txt", iconmemEast);
+		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project_final/rojobridge/icons/tortoiseWest.txt", iconmemWest);
+		/*
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotNE.txt", iconmemNorthEast);
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotNE.txt", iconmemNorthWest);
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotN.txt", iconmemNorth);
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotS.txt", iconmemSouth);
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotSW.txt", iconmemSouthEast);
 		$readmemb("C:/Users/fabuf/OneDrive/Documents/School/ECE_540/project2/rtl_up/hdl_part2/chickenBotSW.txt", iconmemSouthWest);
+		*/
     end
     
     // Combinational logic for translating DTG counters to rojobot location-relative counters
@@ -92,32 +96,38 @@ module icon(
     always @(posedge clock) begin
         // Make icon transparent on reset
         if (~reset_n) begin
-            icon <= 2'b0;
+            icon <= 4'b0;
         end
         
         // Comparator to determine when DTG is scanning the rojobot's location
         if (hiresY >=0 && hiresY < 16) begin
             if (hiresX >= 0 && hiresX < 16) begin
-                case(BotInfo_reg[2:0])
-					NORTH: 		icon <= {iconmemNorth[hiresY][hiresoffset],iconmemNorth[hiresY][hires2X]};
-					NORTHEAST:	icon <= {iconmemNorthEast[hiresY][hiresoffset],iconmemNorthEast[hiresY][hires2X]};
-					EAST:		icon <= {iconmemEast[hiresY][hiresoffset],iconmemEast[hiresY][hires2X]};
-					SOUTHEAST:	icon <= {iconmemSouthEast[hiresY][hiresoffset],iconmemSouthEast[hiresY][hires2X]};
-					SOUTH:		icon <= {iconmemSouth[hiresY][hiresoffset],iconmemSouth[hiresY][hires2X]};
-					SOUTHWEST:	icon <= {iconmemSouthWest[hiresY][hiresoffset],iconmemSouthWest[hiresY][hires2X]};
-					WEST:		icon <= {iconmemWest[hiresY][hiresoffset],iconmemWest[hiresY][hires2X]};
-					NORTHWEST:	icon <= {iconmemNorthWest[hiresY][hiresoffset],iconmemNorthWest[hiresY][hires2X]};
-					default:    icon <= 2'b0;
-				endcase
+                case(botNum) // flag to choose bot A or B icon
+                    0: begin 
+                        case(BotInfo_reg[2:0])
+//        					NORTH: 		icon <= {iconmemNorth[hiresY][hiresoffset],iconmemNorth[hiresY][hires2X]};
+//        					NORTHEAST:	icon <= {iconmemNorthEast[hiresY][hiresoffset],iconmemNorthEast[hiresY][hires2X]};
+                            EAST:		icon <= {iconmemEast[hiresY][hiresoffset],iconmemEast[hiresY][hires2X]};
+//        					SOUTHEAST:	icon <= {iconmemSouthEast[hiresY][hiresoffset],iconmemSouthEast[hiresY][hires2X]};
+//        					SOUTH:		icon <= {iconmemSouth[hiresY][hiresoffset],iconmemSouth[hiresY][hires2X]};
+//        					SOUTHWEST:	icon <= {iconmemSouthWest[hiresY][hiresoffset],iconmemSouthWest[hiresY][hires2X]};
+                            WEST:		icon <= {iconmemWest[hiresY][hiresoffset],iconmemWest[hiresY][hires2X]};
+//        					NORTHWEST:	icon <= {iconmemNorthWest[hiresY][hiresoffset],iconmemNorthWest[hiresY][hires2X]};
+                            default:    icon <= 4'b0;
+                        endcase
+                    end
+                    1: begin
+                    end
+                endcase
 				
             end
             else
-                icon <= 2'b0;
+                icon <= 4'b0;
         end
         
         // icon is transparent for the majority of the world map grid    
         else begin
-            icon <= 2'b0;
+            icon <= 4'b0;
         end
     end   
     
