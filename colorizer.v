@@ -51,8 +51,8 @@ module colorizer(
         BLACK           = 12'h000,
         WHITE           = 12'hFFF,
         RED             = 12'hF00,
-        BLUE            = 12'h0F0,
-        GREEN           = 12'h00F,
+        GREEN           = 12'h0F0,
+        BLUE            = 12'h00F,
         GREY            = 12'hBBB,        
         ORANGE          = 12'hF51,
         PURPLE          = 12'hE07, //R=223, G=7, B=114

@@ -28,6 +28,11 @@ module mfp_ahb_withloader (
     input       [31           :0] IO_BotInfo,
     input                         IO_BotUpdt_Sync,
     
+	output      [7            :0] IO_BotCtrl_1,
+    output                        IO_INT_ACK_1,
+    input       [31           :0] IO_BotInfo_1,
+    input                         IO_BotUpdt_Sync_1,
+	
     //7-segment LEDs
     output      [`MFP_N_SEVSEG-1:0] AN,
     output                          DP,
@@ -142,7 +147,11 @@ module mfp_ahb_withloader (
         .IO_BotCtrl       (IO_BotCtrl),
         .IO_INT_ACK       (IO_INT_ACK),
         .IO_BotInfo       (IO_BotInfo),
-        .IO_BotUpdt_Sync  (IO_BotUpdt_Sync)
+        .IO_BotUpdt_Sync  (IO_BotUpdt_Sync),
+        .IO_BotCtrl_1       (IO_BotCtrl_1),
+        .IO_INT_ACK_1       (IO_INT_ACK_1),
+        .IO_BotInfo_1       (IO_BotInfo_1),
+        .IO_BotUpdt_Sync_1  (IO_BotUpdt_Sync_1)
         
     );
 

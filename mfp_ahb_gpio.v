@@ -19,13 +19,7 @@ module mfp_ahb_gpio(
 // memory-mapped I/O
     input      [`MFP_N_SW-1  :0] IO_Switch,
     input      [`MFP_N_PB-1  :0] IO_PB,
-    output reg [`MFP_N_LED-1 :0] IO_LED,
-    
-// Rojobot memory-mapped I/O
-    output reg  [7            :0] IO_BotCtrl,
-    output reg                    IO_INT_ACK,
-    input       [31           :0] IO_BotInfo,
-    input                         IO_BotUpdt_Sync
+    output reg [`MFP_N_LED-1 :0] IO_LED
 );
 
   reg  [3:0]  HADDR_d;
@@ -49,13 +43,9 @@ module mfp_ahb_gpio(
     always @(posedge HCLK or negedge HRESETn)
        if (~HRESETn) begin
          IO_LED <= `MFP_N_LED'b0;  
-         IO_BotCtrl <= `MFP_N_BOTCTRL'b0;
-         IO_INT_ACK <= `MFP_N_INTACK'b0;
        end else if (we)
          case (HADDR_d)
            `H_LED_IONUM: IO_LED <= HWDATA[`MFP_N_LED-1:0];
-           `H_BOTCTRL_IONUM: IO_BotCtrl <= HWDATA[`MFP_N_BOTCTRL-1:0];  //IO_BOTCTRL assigned from HWDATA
-           `H_BOTINTACK_IONUM: IO_INT_ACK <= HWDATA[`MFP_N_INTACK-1:0]; //IO_INT_ACK assigned from HWDATA
          endcase
     
 	always @(posedge HCLK or negedge HRESETn)
@@ -65,8 +55,6 @@ module mfp_ahb_gpio(
 	     case (HADDR)
            `H_SW_IONUM: HRDATA <= { {32 - `MFP_N_SW {1'b0}}, IO_Switch };
            `H_PB_IONUM: HRDATA <= { {32 - `MFP_N_PB {1'b0}}, IO_PB };
-           `H_BOTINFO_IONUM :   HRDATA <= IO_BotInfo;                           //New for Rojobot
-           `H_BOTUPDSYNC_IONUM: HRDATA <= { {32 - 1 {1'b0}}, IO_BotUpdt_Sync }; //New for Rojobot
             default:    HRDATA <= 32'h00000000;
          endcase
 		 
